@@ -12,7 +12,6 @@ def get_template(stack_name):
 def create_changeset(stack_name, template_body):
     changeset_name = f"ChangeSet-{uuid.uuid4()}"
 
-    # ✅ Convert to valid JSON string
     template_body_json = json.dumps(template_body)
 
     response = cf.create_change_set(
