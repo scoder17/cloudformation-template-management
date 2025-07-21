@@ -12,11 +12,11 @@ def get_cf_template(stack_name):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/template/private', methods=['PUT'])
-def update_template():
+@app.route('/template/private/<subnet_name>', methods=['PUT'])
+def update_template(subnet_name):
     try:
         template_json = request.get_json()
-        modified_template = make_subnet_private(template_json)
+        modified_template = make_subnet_private(template_json, subnet_name)
         return jsonify(modified_template), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
