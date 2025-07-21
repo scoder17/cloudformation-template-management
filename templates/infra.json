@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Create VPC, IGW, Subnet, Route Table, and Association",
+  "Description": "Create VPC, IGW, Two Public Subnets, Route Tables, and Associations",
   "Resources": {
     "MyVPC": {
       "Type": "AWS::EC2::VPC",
@@ -62,7 +62,31 @@
         ]
       }
     },
-    "MyRouteTable": {
+    "MySecondSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "MyVPC"
+        },
+        "CidrBlock": "10.0.2.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MySecondSubnet"
+          }
+        ]
+      }
+    },
+    "MyRouteTable1": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
@@ -71,17 +95,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "MyRouteTable"
+            "Value": "MyRouteTable1"
           }
         ]
       }
     },
-    "MyRoute": {
+    "MyRoute1": {
       "Type": "AWS::EC2::Route",
       "DependsOn": "AttachGateway",
       "Properties": {
         "RouteTableId": {
-          "Ref": "MyRouteTable"
+          "Ref": "MyRouteTable1"
         },
         "DestinationCidrBlock": "0.0.0.0/0",
         "GatewayId": {
@@ -89,14 +113,52 @@
         }
       }
     },
-    "SubnetRouteTableAssociation": {
+    "MyRouteTable2": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "MyVPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyRouteTable2"
+          }
+        ]
+      }
+    },
+    "MyRoute2": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "AttachGateway",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "MyRouteTable2"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "MyInternetGateway"
+        }
+      }
+    },
+    "SubnetRouteTableAssociation1": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
         "SubnetId": {
           "Ref": "MySubnet"
         },
         "RouteTableId": {
-          "Ref": "MyRouteTable"
+          "Ref": "MyRouteTable1"
+        }
+      }
+    },
+    "SubnetRouteTableAssociation2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "MySecondSubnet"
+        },
+        "RouteTableId": {
+          "Ref": "MyRouteTable2"
         }
       }
     }
@@ -112,7 +174,13 @@
       "Value": {
         "Ref": "MySubnet"
       },
-      "Description": "Subnet ID"
+      "Description": "Primary Subnet ID"
+    },
+    "SecondSubnetId": {
+      "Value": {
+        "Ref": "MySecondSubnet"
+      },
+      "Description": "Second Subnet ID"
     },
     "InternetGatewayId": {
       "Value": {
@@ -120,11 +188,17 @@
       },
       "Description": "IGW ID"
     },
-    "RouteTableId": {
+    "RouteTable1Id": {
       "Value": {
-        "Ref": "MyRouteTable"
+        "Ref": "MyRouteTable1"
       },
-      "Description": "Route Table ID"
+      "Description": "Route Table 1 ID"
+    },
+    "RouteTable2Id": {
+      "Value": {
+        "Ref": "MyRouteTable2"
+      },
+      "Description": "Route Table 2 ID"
     }
   }
 }
