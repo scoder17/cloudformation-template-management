@@ -61,7 +61,7 @@ This endpoint takes the stack_name as parameter and then returns the Template Bo
 ### Response Screenshot
 ![Screenshot](screenshots/1.png)
 
-### **PUT /template/private\<subnet_name>**
+### **PUT /template/private/\<subnet_name>**
 
 This endpoint takes the template json and converts the subnet from public to private. You can provide json using Body->raw in Postman. It returns the modified template Json as response.
 
